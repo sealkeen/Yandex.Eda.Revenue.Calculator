@@ -8,13 +8,41 @@ using System.Windows.Forms;
 
 namespace CountCourierRublesPerHour
 {
-    class Program
+    public class Program
     {
         private static double totalMoney = 0.0, totalHours = 0.0, totalOrders = 0.0, totalFines = 0.0;
         private static string header = "\tDate\tSalary\t\t Hours\t\tРуб/Час\t\tOrders\tРуб/Зак Fines (Rub.):";
-        static string lastPath = "";
-        /**/ //static List<Dictionary<double, double>> moneyAndHours = new List<Dictionary<double, double>>();
+        static string lastPath = ""; //static List<Dictionary<double, double>> moneyAndHours = new List<Dictionary<double, double>>();
         static WeekRange weekRange;
+
+        [STAThread]
+        static void Main(string[] args)
+        {
+            string path = "";
+            do {
+                Initialize();
+                Console.WriteLine("Enter the path to finances comma separated :");
+
+                if ( File.Exists(lastPath) )
+                    System.Windows.Forms.Clipboard.SetText(lastPath);
+                path = Console.ReadLine();
+                if (File.Exists(path))
+                    WriteLastPath(path);
+
+                if ( File.Exists(path) ) {
+                    try {
+                        ReceiveMoney(path);
+                        CountResultingWeekFinances();
+                        ShowEachWeekFinances();
+                        ShowResultingWeekFinances();
+                        ShowAverageWeekFinances();
+                    } catch (Exception ex) {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            } while (true);
+        }
+
         static void Initialize()
         {
             lastPath = "";
@@ -174,33 +202,6 @@ namespace CountCourierRublesPerHour
             
         }
 
-        [STAThread]
-        static void Main(string[] args)
-        {
-            string path = "";
-            do {
-                Initialize();
-                Console.WriteLine("Enter the path to finances comma separated :");
-
-                if ( File.Exists(lastPath) )
-                    System.Windows.Forms.Clipboard.SetText(lastPath);
-                path = Console.ReadLine();
-                if (File.Exists(path))
-                    WriteLastPath(path);
-
-                if ( File.Exists(path) ) {
-                    try {
-                        ReceiveMoney(path);
-                        CountResultingWeekFinances();
-                        ShowEachWeekFinances();
-                        ShowResultingWeekFinances();
-                        ShowAverageWeekFinances();
-                    } catch (Exception ex) {
-                        Console.WriteLine(ex.Message);
-                    }
-                }
-            } while (true);
-        }
 
         static string GetMonthByNumber(int number) {
             switch (number) {
